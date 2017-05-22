@@ -1,0 +1,343 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package unobest.model;
+
+import java.lang.reflect.Field;
+import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import static org.junit.Assert.*;
+import org.junit.Before;
+import org.mockito.Mockito;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import unobest.rmistuff.clientside.BusTrackingClient;
+import unobest.rmistuff.serverside.impl.ListOfBusses;
+import unobest.rmistuff.serverside.interfaces.BusFascade;
+import unobest.util.Util;
+
+/**
+ *
+ * @author AkshayPopat
+ */
+public class BusTest {
+
+    public BusTest() {
+    }
+
+    @BeforeClass
+    public static void setUpClass() {
+
+    }
+    
+     @Before
+    public void setUp() throws Exception{
+    Field field = Bus.class.getDeclaredField("busses");
+    field.setAccessible(true);
+    field.set(null, new HashMap<>());
+    }
+
+    @AfterClass
+    public static void tearDownClass() {
+    }
+
+    @After
+    public void tearDown() {
+    }
+
+    /**
+     * Test of getBusses method, of class Bus.
+     */
+    @Test
+    public void testBus() {
+        System.out.println("Bus");
+        Bus b1 = new Bus();
+        Bus b2 = new Bus();
+        
+        b1.getReg();
+
+        
+
+    }
+        /**
+     * Test of second construtor method, of class Bus.
+     */
+    @Test
+    public void testBus1() {
+        System.out.println("Bus");
+        Bus b1 = new Bus(100);
+        assertEquals(b1.getReg(),"UNO " + 100);
+    }
+
+    /**
+     * Test of getBusses method, of class Bus.
+     */
+    @Test
+    public void testGetBusses(){
+        System.out.println("getBusses");
+        Bus bus1 = new Bus();
+        Bus bus2 = new Bus();
+        boolean pass = false;
+        for (Bus b : Bus.getBusses()) {
+            if (b.equals(bus1) || b.equals(bus2)) {
+                pass = true;
+            } else {
+                pass = false;
+            }
+        }
+        assertTrue(pass);
+
+    }
+
+    /**
+     * Test of toString method, of class Bus.
+     */
+    @Test
+    public void testToString() {
+        System.out.println("toString");
+        Bus instance = new Bus();
+        String reg = instance.reg;
+        int capacity = 32;
+        String expResult = "Bus{" + "reg=" + reg + ", capacity=" + capacity + '}';
+        String result = instance.toString();
+        assertEquals(expResult, result);
+
+    }
+
+    /**
+     * Test of getBus method, of class Bus.
+     */
+    @Test
+    public void testGetBus() {
+        System.out.println("getBus");
+        Bus bus = new Bus();
+        Bus bus1 = new Bus();
+        assertEquals(bus, Bus.getBus(bus.getReg()));
+    }
+
+    /**
+     * Test of arrivedAtStop method, of class Bus.
+     */
+    @Test
+    public void testArrivedAtStop_Leg() throws RemoteException {
+        System.out.println("testArrivedAtStop_Leg()");
+
+        Bus b = new Bus();
+        Leg l1 = null;
+        Leg l2 = new Leg(Stop.getShelterFromFullName("kak"), new unobest.model.Time(12, 00), new unobest.model.Time(11, 10));
+        b.arrivedAtStop(l1);
+        //assertEquals(b,Bus.getBus("0"));
+
+    }
+
+    /**
+     * Test of arrivedAtStop method, of class Bus.
+     */
+    @Test
+    public void testArrivedAtStop_Leg1() throws RemoteException {
+        System.out.println("testArrivedAtStop_Leg()");
+        Bus b = new Bus();
+        Leg l1 = new Leg(Stop.getShelterFromFullName("LRCEntrance"), new unobest.model.Time(12, 00), new unobest.model.Time(11, 10));
+        b.arrivedAtStop(l1);
+        assertEquals(b.getLeg(), l1);
+    }
+
+    /**
+     * Test of arrivedAtStop method, of class Bus.
+     */
+    @Test
+    public void testArrivedAtStop_String() {
+        System.out.println("arrivedAtStop");
+        String s = "";
+        Bus b = new Bus();
+        Leg l1 = new Leg(Stop.getShelterFromFullName("LRCEntrance"), new unobest.model.Time(12, 00), new unobest.model.Time(11, 10));
+        b.arrivedAtStop(l1);
+        assertEquals(b.getLeg(), l1);
+        
+        
+    }
+    
+    
+    /**
+     * Test of arrivedAtStop1 method, of class Bus.
+     * Throwing a null pointer
+     */
+    @Test
+    public void testArrivedAtStop_String1() {
+        String s = "LRCEntrance";
+        Bus b = new Bus();
+        Leg l1 = new Leg(Stop.getShelterFromFullName("LRCEntrance"), new unobest.model.Time(12, 00), new unobest.model.Time(11, 10));
+        //Travelling cj = Mockito.mock(Travelling.class);
+        b.currentJourney = new Travelling(b, new Journey(new Route("2002", "Indain 1"), "Wednesday", "India"));
+        //b.currentJourney.arrivedAtStop(s);
+        b.arrivedAtStop(s);
+        assertNotNull(s);
+    }
+
+    
+ 
+
+    /**
+     * Test of getReg method, of class Bus.
+     */
+    @Test
+    public void testGetReg() {
+        System.out.println("getReg");
+        Bus instance = new Bus();
+        String expResult = "616";
+        String result = instance.getReg();
+
+        assertEquals(instance.reg, result);
+
+    }
+
+    /**
+     * Test of getCurrentStatus method, of class Bus.
+     */
+    @Test
+    public void testGetCurrentStatus() {
+        System.out.println("getCurrentStatus");
+        Bus instance = new Bus();
+        Travelling expResult = null;
+        Travelling result = instance.getCurrentStatus();
+        assertEquals(instance.currentJourney, result);
+
+    }
+
+    /**
+     * Test of isWatchedBy method, of class Bus.
+     */
+    @Test
+    public void testIsWatchedBy() {
+        System.out.println("isWatchedBy");
+        BusTrackingClient client = null;
+        Bus instance = new Bus();
+        boolean expResult = false;
+        boolean result = instance.isWatchedBy(client);
+        assertEquals(expResult, result);
+
+    }
+
+    /**
+     * Test of addWatcher method, of class Bus.
+     */
+    @Test
+    public void testAddWatcher() {
+        System.out.println("addWatcher");
+        BusTrackingClient client = null;
+        Bus instance = new Bus();
+        instance.addWatcher(client);
+
+    }
+
+    /**
+     * Test of removeWatcher method, of class Bus.
+     */
+    @Test
+    public void testRemoveWatcher() {
+        System.out.println("removeWatcher");
+        BusTrackingClient client = null;
+        Bus instance = new Bus();
+        instance.removeWatcher(client);
+
+    }
+
+    /**
+     * Test of notifyWatchers method, of class Bus.
+     */
+    @Test
+    public void testNotifyWatchers() {
+        System.out.println("notifyWatchers");
+        Bus instance = new Bus();
+        instance.notifyWatchers();
+
+    }
+
+    /**
+     * Test of getLeg method, of class Bus.
+     */
+    @Test
+    public void testGetLeg() {
+        System.out.println("getLeg");
+        Bus instance = new Bus();
+        Leg expResult = null;
+        Leg result = instance.getLeg();
+        assertEquals(expResult, result);
+
+    }
+
+    /**
+     * Test of setJourney method, of class Bus.
+     */
+    @Test
+    public void testSetJourney() {
+        System.out.println("setJourney");
+        Journey journey = new Journey(new Route("111", "Luton"), "Tuesday", "Tuesday 9am");;
+        Bus instance = new Bus();
+        instance.setJourney(journey);
+
+        assertTrue(true);
+    }
+
+    /**
+     * Test of getCurrentRoute method, of class Bus.
+     */
+    @Test
+    public void testGetCurrentRoute() {
+        System.out.println("getCurrentRoute");
+        
+        Bus b1 = new Bus();
+        
+        
+        Route r1 = new Route("2002", "India");
+        Route expResult = null;
+        
+        Journey j1 = new Journey(new Route("2002", "India"), "Wednesday", "India");
+        Journey expResult1 = null;
+        
+        b1.currentJourney = new Travelling(b1, j1);
+        
+        Route result = b1.getCurrentRoute();
+        assertEquals(r1, result);
+
+    }
+    
+   
+
+    /**
+     * Test of getJourney method, of class Bus.
+     */
+    @Test
+    public void testGetJourney() {
+        System.out.println("getJourney");
+        Bus b1 = new Bus();
+        Journey j1 = new Journey(new Route("2002", "India"), "Wednesday", "India");
+        Journey result = b1.getJourney();
+        b1.currentJourney = new Travelling(b1, j1);
+        b1.setJourney(j1);
+        assertEquals(b1.getJourney(), j1);
+
+    }
+
+
+    @Test
+    public void TestBus2(){
+        
+        Bus b1 = new Bus("R12");
+        assertEquals(b1,Bus.getBus("R12"));
+
+}
+}
+

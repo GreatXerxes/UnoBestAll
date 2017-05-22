@@ -1,0 +1,139 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+package unobest.model;
+
+import java.io.Serializable;
+import unobest.rmistuff.serverside.interfaces.Watchable;
+import java.util.HashMap;
+import unobest.model.helpers.BusHelper;
+import unobest.rmistuff.clientside.BusTrackingClient;
+import unobest.util.Util;
+
+/**
+ *
+ * @author comqdhb
+ */
+public class Bus implements Watchable, Serializable {
+
+    public static Iterable<Bus> getBusses() {
+        return busses.values();
+    }
+
+    @Override
+    public String toString() {
+        return "Bus{" + "reg=" + reg + ", capacity=" + capacity + '}';
+    }
+    Travelling currentJourney;
+    String reg;
+    String rfid;
+    int capacity=32;
+    public static int nb=1;
+    
+    private static HashMap<String,Bus> busses = new HashMap<String,Bus>();
+    public static Bus getBus(String reg){
+        return busses.get(reg);
+    }
+    
+    public Bus(){
+        reg="UNO "+format(nb++);
+        busses.put(reg, this);
+        helper = new BusHelper(this);
+        System.out.println("============================== "+reg+" ========================================");
+    }
+    
+    private static String format(int n){
+        String result=n+"";
+        while (result.length()<3){
+            result="0"+result;
+        }
+        return result;
+    }
+
+    public void arrivedAtStop(Leg nextLeg) {
+        if (currentJourney==null){
+            currentJourney=new Travelling(this,nextLeg);
+        }
+        currentJourney.arrivedAtStop(nextLeg);
+        notifyWatchers();
+    }
+    
+    public void arrivedAtStop(String s) {
+        currentJourney.arrivedAtStop(s);
+        notifyWatchers();
+    }
+
+    public String getReg() {
+        return reg;
+    }
+    
+    public Travelling getCurrentStatus(){
+        return currentJourney;
+    }
+    
+    
+    /////////////////////////////////////////////////////////
+    
+    BusHelper helper; 
+
+    @Override
+    public boolean isWatchedBy(BusTrackingClient client)  {
+    return helper.isWatchedBy(client);
+    }
+
+    @Override
+    public void addWatcher(BusTrackingClient client) {
+    helper.addClient(client);
+    }
+    
+
+    @Override
+    public void removeWatcher(BusTrackingClient client) {
+    helper.removeClient(client);
+    }
+    
+    @Override
+    public void notifyWatchers(){
+        helper.notifyClients(Util.getFascade(this));
+    }
+///////////////////////////////////////////////////////////
+
+    public Leg getLeg() {
+        Leg l=null;
+        if (currentJourney!=null){
+            l=currentJourney.currentLeg;
+        }
+        return l;
+    }
+
+    public void setJourney(Journey journey) {
+        helper.removeBusFromClients();
+        currentJourney = new Travelling(this,journey);        
+        helper.addAll(currentJourney.journey.route.getWatchers());
+    }
+
+    public Route getCurrentRoute() {
+        Route r= null;
+        if (currentJourney!=null){
+            Journey j = currentJourney.journey;
+            if (j!=null){
+                r=j.route;
+            }
+        }
+        return r;
+    }
+
+    public Journey getJourney(){
+        if (currentJourney != null)
+        {
+            return currentJourney.journey;
+        }
+        return null;
+    }
+
+    
+    
+}

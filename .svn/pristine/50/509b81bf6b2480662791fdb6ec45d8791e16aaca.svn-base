@@ -1,0 +1,108 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package test;
+
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.TreeMap;
+import unobest.model.Customer;
+import unobest.model.Journey;
+import unobest.model.Leg;
+import unobest.model.Route;
+import unobest.model.Stop;
+import unobest.model.Bus;
+import unobest.model.Shelter;
+/**
+ *
+ * @author Samsung
+ */
+public class HardcodeData implements Serializable
+{
+    private TreeMap<String,Customer> allCustomers = new TreeMap<String, Customer>();
+    private TreeMap<String,Route> allRoutes = new TreeMap<String,Route>();
+    
+    public static void main(String[] args) {
+        HardcodeData test = new HardcodeData();
+        test.run();
+    }
+    
+    public void run()
+    {
+        allCustomers.put("David",new Customer("David", "password"));
+        allCustomers.put("Josh",new Customer("Josh", "password"));
+        allCustomers.put("Ian",new Customer("Ian", "password"));
+        allCustomers.put("Frankies",new Customer("Frankies", "password"));
+        
+        Stop.HARDCODEDSTUFFTHATSGONNABEREMOVED();
+        
+        Leg leg1 = new Leg(Stop.getShelterFromFullName("LRCEntrance"), new unobest.model.Time(12, 00), new unobest.model.Time(11, 10));
+        Leg leg2 = new Leg(Stop.getShelterFromFullName("QA_Dingi"), new unobest.model.Time(13, 00), new unobest.model.Time(12, 00));
+        Leg leg3 = new Leg(Stop.getShelterFromFullName("Reichstag"), new unobest.model.Time(14, 00), new unobest.model.Time(13, 00));
+        Leg leg4 = new Leg(Stop.getShelterFromFullName("DLV"), new unobest.model.Time(15, 00), new unobest.model.Time(14, 00));
+        Leg leg5 = new Leg(Stop.getShelterFromFullName("Burning_Swan_Lake"), new unobest.model.Time(16, 00), new unobest.model.Time(15, 00));
+        
+        Route r = new Route("Stairway to Hell", "666");
+        Journey j = new Journey(r,"Monday","This is journey desc");
+        j.addLeg(leg1);
+        j.addLeg(leg2);
+        j.addLeg(leg3);
+        j.addLeg(leg4);
+        j.addLeg(leg5);
+        
+        Bus killMeNow = new Bus();
+        killMeNow.setJourney(j);
+        
+        j.addBus(killMeNow);
+        
+        
+        allRoutes.put("666",r);
+        allRoutes.put("111",new Route("2","111"));
+        
+        
+        writeCustomerFile();
+        writeRoutesFile();
+
+    }
+    
+    public void writeCustomerFile()
+    {
+        try
+      {
+         FileOutputStream fileOut =
+         new FileOutputStream("customers.ser");
+         ObjectOutputStream out = new ObjectOutputStream(fileOut);
+         out.writeObject(allCustomers);
+         out.close();
+         fileOut.close();
+          System.out.println("Saved Customers ");
+      }
+        catch(IOException i)
+        {
+            i.printStackTrace();
+        }
+    }
+    
+    public void writeRoutesFile()
+    {
+        try
+      {
+         FileOutputStream fileOut =
+         new FileOutputStream("routes.ser");
+         ObjectOutputStream out = new ObjectOutputStream(fileOut);
+         out.writeObject(allRoutes);
+         out.close();
+         fileOut.close();
+          System.out.println("Saved Routes ");
+      }
+        catch(IOException i)
+        {
+            i.printStackTrace();
+        }
+    }
+}

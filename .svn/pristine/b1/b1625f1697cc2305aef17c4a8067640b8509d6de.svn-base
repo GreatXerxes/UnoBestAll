@@ -1,0 +1,116 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package unobest.model;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+
+/**
+ *
+ * @author comqdhb
+ */
+public class Stop implements Serializable{
+
+    private static HashMap<String, Stop> map = new HashMap<String, Stop>();
+
+    public static Stop getStop(String name) {
+        return map.get(name);
+    }
+
+    public static Shelter getShelterFromFullName(String name) {
+        String ss = name.trim();
+        int p = ss.indexOf("(");
+        String shelter = "";
+        if (p > 0) {
+            shelter = ss.substring(p);
+            ss = ss.substring(0, p);
+        }
+        Stop stop = map.get(ss);
+        if (stop==null){
+            stop=new Stop(ss,shelter);
+            map.put(ss, stop);
+        }
+        Shelter shelt = stop.getShelter(shelter);
+        if (shelt==null){
+            shelt=new Shelter(stop,shelter);
+        }
+        return shelt;
+    }
+
+    @Override
+    public String toString() {
+        return "Stop{" + name + '}';
+    }
+
+    Map<String,Shelter> shelters = new HashMap<String,Shelter>();
+
+    String name;
+    protected Stop(String ss, String shelter) { //This was protected
+        name=ss;
+        shelters.put(shelter,new Shelter(this,shelter));
+     }
+
+    private Shelter getShelter(String shelter) {
+        return shelters.get(shelter);
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 89 * hash + Objects.hashCode(this.name);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Stop other = (Stop) obj;
+        if (!Objects.equals(this.name, other.name)) {
+            return false;
+        }
+        return true;
+    }
+
+    void addShelter(Shelter aThis) {
+    shelters.put(aThis.name, aThis);
+    }
+
+    public String getName() {
+    return name;
+    }
+    
+    public String[] getShelterNames(){
+        ArrayList<String> names= new ArrayList<String>(shelters.keySet());
+        return names.toArray(new String[names.size()]);
+    }
+    
+    public static void HARDCODEDSTUFFTHATSGONNABEREMOVED()
+    {
+        Stop stop1 = new Stop("LRC", "LRCEntrance");
+        Stop stop2 = new Stop("Queen's Anne Revenge", "QA_Dingi");
+        Stop stop3 = new Stop("Reichstag", "Reichstag");
+        Stop stop4 = new Stop("DLV", "DLV");
+        Stop stop5 = new Stop("Burning Lake", "Burning_Swan_Lake");
+        Stop stop6 = new Stop("Lucy's Arse", "Lucy_Arse");
+        
+        Stop stop7 = new Stop("Choc", "Chocolate Road");
+        Stop stop8 = new Stop("Puppy", "Puppy Stop");
+        Stop stop9 = new Stop("BBB", "Big Booty Boulevard");
+        Stop stop10 = new Stop("Cloud", "Cloud Lane");
+        Stop stop11 = new Stop("Pearl Gates", "Pearl Gates");
+
+    }
+}

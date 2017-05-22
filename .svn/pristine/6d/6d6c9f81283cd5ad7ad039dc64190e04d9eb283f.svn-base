@@ -1,0 +1,62 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+package unobest.model;
+
+import java.util.HashSet;
+import java.util.Set;
+
+/**
+ *
+ * @author comqdhb
+ */
+public class ControllerLeg extends Leg {
+
+    public static ControllerLeg getInstance() {
+        if (instance==null){
+            instance= new ControllerLeg(null,null,null);
+        }
+        return instance;
+    }
+    
+    HashSet<Bus> busses= new HashSet<Bus>();
+    
+    private static ControllerLeg instance=null;
+    
+    //Changed to public
+    private ControllerLeg(Shelter s,Time t,Time dt){
+        super(s,t,dt);
+    }
+    
+    public Set<Bus> getParkedBusses(){
+        return busses;
+    }
+    
+    public void assignBusToJourney(Bus b,Journey j){
+        b.arrivedAtStop(j.getFirstLeg());
+        busses.remove(b);
+    }
+    
+    public Bus assignAvailableBusToJourney(Journey journey) {
+        if (busses.size()==0){
+            busses.add(new Bus());
+        } else {
+            System.out.println("---------------- using bus from the pool-------------------------");
+        }
+        Bus bus=busses.iterator().next();
+        assignBusToJourney(bus,journey);
+        busses.remove(bus);
+        return bus;
+    }
+    
+    void addBus(Bus bus) {
+        busses.add(bus);
+    }
+    protected static ControllerLeg getNew()// JUST FOR THE PURPOSES OF TESTING
+    {
+        return new ControllerLeg(null,null,null);
+    }
+}

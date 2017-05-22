@@ -1,0 +1,32 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package Interfaces;
+
+import java.rmi.Remote;
+import java.rmi.RemoteException;
+import java.util.List;
+import unobest.model.Bus;
+import unobest.rmistuff.clientside.BusTrackingClient;
+import unobest.rmistuff.serverside.interfaces.BusFascade;
+
+/**
+ *
+ * @author cm12aco
+ */
+public interface ListOfBusesInter extends Remote
+{
+
+    public boolean addBus(Bus b) throws RemoteException;
+
+    BusFascade getBusFascade(Bus b) throws RemoteException;
+    
+    List<BusFascade> getAllBusFascades() throws RemoteException;
+    
+    void busArrivedAtStop(String stop, String reg) throws RemoteException;
+
+
+}
+

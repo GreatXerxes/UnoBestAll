@@ -1,0 +1,302 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package unobest.rmistuff.clientside;
+
+import java.awt.Color;
+import java.net.URL;
+import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.SwingWorker;
+import javax.swing.border.Border;
+import javax.swing.border.TitledBorder;
+import unobest.rmistuff.serverside.interfaces.BusFascade;
+import unobest.rmistuff.serverside.interfaces.RouteFascade;
+
+/**
+ *
+ * @author comqdhb
+ */
+public class RoutePanel extends javax.swing.JPanel {
+
+    RouteFascade route;
+    JLabel[] stopsL;
+    private HashSet<BusFascade> busses = new HashSet<BusFascade>();
+    private ImageIcon busIcon;
+    private ImageIcon blankIcon;
+    private ImageIcon busStopIcon;
+    private TitledBorder tb;
+
+    private static List<RouteFascade> fas = new ArrayList<RouteFascade>();
+
+    /**
+     * Creates new form RoutePanel
+     */
+    public RoutePanel(final RouteFascade r) throws RemoteException {
+
+        SwingWorker worker = new SwingWorker() {
+
+            @Override
+            protected Object doInBackground() throws Exception {
+                try {
+
+                    java.net.URL imageURL = RoutePanel.class.getResource("bus.png");
+
+                    if (imageURL != null) {
+                        busIcon = new ImageIcon(imageURL);
+                    }
+                    imageURL = RoutePanel.class.getResource("blank.png");
+
+                    if (imageURL != null) {
+                        blankIcon = new ImageIcon(imageURL);
+                    }
+
+                    imageURL = RoutePanel.class.getResource(".png");
+                    if (imageURL != null) {
+                        busStopIcon = new ImageIcon(imageURL);
+                    }
+                    String[] stops = r.getStops();
+
+                    //System.out.println("Number of stops: " + stops.length);
+                    int n = 0;
+                    stopsL = new JLabel[stops.length];
+                    for (int i = 0; i < stops.length; i++) {
+                        stopsL[i] = new JLabel(stops[i]);
+                        stopsL[i].setUI(new JVLabel(true));
+                        add(stopsL[i]);
+                        stopsL[i].setBounds(16 + 24 * n, 20, 20, 450);
+
+                        stopsL[i].setIcon(blankIcon);
+                        //stopsL[i].setIcon(busStopIcon);
+
+                        n++;
+                    }
+                    tb = javax.swing.BorderFactory.createTitledBorder(route.getName());
+                    initComponents();
+
+                } catch (Exception ne) {
+                    ne.printStackTrace();
+                }
+
+                return null;
+
+            }
+
+            @Override
+            public void done() {
+
+                setBorder(tb);
+            }
+        };
+    }
+
+    //NEW
+    RoutePanel() {
+
+        SwingWorker worker = new SwingWorker() {
+
+            @Override
+            protected Object doInBackground() throws Exception {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+        };
+
+        worker.execute();
+
+    }
+
+    public RoutePanel(List<RouteFascade> e) throws RemoteException {
+        System.out.println("Motherfucker I'm running");
+        System.out.println(e.size());
+        fas = e;
+        for (int i = 0; i < fas.size(); i++) {
+            System.out.println("Guess What?   I'm Running!!");
+            RouteFascade r = fas.get(i);
+            System.out.println(r.getName());
+            setUpRoutePanel(r);
+        }
+    }
+
+    void setUpRoutePanel(final RouteFascade r) throws RemoteException {
+
+        try {
+
+            //SwingWorker worker = new SwingWorker()
+           // { //Untested
+
+                //@Override
+                //protected Object doInBackground() throws Exception
+                //{
+                    URL imageURL = RoutePanel.class.getResource("bus.png");
+
+                    if (imageURL != null) {
+                        busIcon = new ImageIcon(imageURL);
+                    }
+                    imageURL = RoutePanel.class.getResource("blank.png");
+
+                    if (imageURL != null) {
+                        blankIcon = new ImageIcon(imageURL);
+                    }
+
+                    imageURL = RoutePanel.class.getResource(".png");
+                    if (imageURL != null) {
+                        busStopIcon = new ImageIcon(imageURL);
+                    }
+
+                    String[] stops = r.getStops();
+                    int n = 0;
+                    stopsL = new JLabel[stops.length];
+                    for (int i = 0; i < stops.length; i++) {
+                        stopsL[i] = new JLabel(stops[i]);
+                        stopsL[i].setUI(new JVLabel(true));
+                        add(stopsL[i]);
+                        stopsL[i].setBounds(16 + 24 * n, 20, 20, 450);
+
+                        stopsL[i].setIcon(blankIcon);
+                        //stopsL[i].setIcon(busStopIcon);
+
+                        n++;
+                    }
+                    Border blackline = BorderFactory.createLineBorder(Color.black);
+                    
+                    
+                    tb = javax.swing.BorderFactory.createTitledBorder(blackline, route.getName());
+                    initComponents();
+                    //return null;
+                //}
+
+                //@Override
+                //public void done()
+                //{
+                    System.out.println(tb.getTitle());
+                    setBorder(tb);
+                //}
+
+            //};
+
+            //worker.execute();
+
+        } catch (Exception ne) {
+            ne.printStackTrace();
+        }
+    }
+
+    public void addBus(final BusFascade bus) {
+
+        try {
+
+            SwingWorker worker = new SwingWorker() {
+
+                @Override
+                protected Object doInBackground() throws Exception {
+                    try {
+                        busses.add(bus);
+                        String stop = bus.getStop();
+
+                    } catch (RemoteException ex) {
+                        Logger.getLogger(RoutePanel.class
+                                .getName()).log(Level.SEVERE, null, ex);
+                    }
+
+                    return null;
+                }
+            };
+            worker.execute();
+        } catch (Exception ne) {
+            ne.printStackTrace();
+        }
+
+    }
+
+    public void removeBus(BusFascade bus) {
+        busses.remove(bus);
+    }
+
+    public boolean containsBus(BusFascade bus) {
+        return busses.contains(bus);
+    }
+
+    //Untested
+    public void updateBusPosition(final BusFascade bus) throws RemoteException {
+        try {
+            SwingWorker worker = new SwingWorker() {
+
+                @Override
+                protected Object doInBackground() throws Exception {
+                    addBus(bus);
+                    String s = bus.getStop();
+                    updateLabels(s);
+                    System.out.println("route panel updating bus position");
+                    return null;
+                }
+            };
+            worker.execute();
+        } catch (Exception ne) {
+            ne.printStackTrace();
+        }
+    }
+
+    //Untested 
+    public void updateLabels(String s) {
+        final HashSet<String> stopNames = new HashSet<String>();
+
+        try {
+            SwingWorker worker6 = new SwingWorker() {
+
+                @Override
+                protected Object doInBackground() throws Exception {
+                    for (BusFascade bus : busses) {
+                        try {
+                            stopNames.add(bus.getStop());
+                        } catch (RemoteException r) {
+                            r.printStackTrace();
+                        }
+                    }
+                    for (String sn : stopNames) {
+                        System.out.println("" + sn);
+                    }
+                    for (JLabel l : stopsL) {
+                        if (stopNames.contains(l.getText())) {
+                            l.setIcon(busIcon);
+                        } else {
+                            l.setIcon(blankIcon);
+                        }
+                    }
+                    return null;
+                }
+            };
+
+            worker6.execute();
+        } catch (Exception ne) {
+            ne.printStackTrace();
+        }
+    }
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        setBorder(javax.swing.BorderFactory.createTitledBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED), "Hmm"));
+        setMaximumSize(new java.awt.Dimension(32767, 240));
+        setLayout(null);
+    }// </editor-fold>//GEN-END:initComponents
+
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    // End of variables declaration//GEN-END:variables
+}

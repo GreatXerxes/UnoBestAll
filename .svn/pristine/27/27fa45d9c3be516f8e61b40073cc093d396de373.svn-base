@@ -1,0 +1,140 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package unobest.rmistuff.serverside.impl;
+
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.TreeMap;
+import unobest.model.Customer;
+import unobest.model.WatchList;
+import unobest.rmistuff.clientside.BusTrackingClient;
+import unobest.rmistuff.serverside.interfaces.CustomerFascade;
+
+/**
+ *
+ * @author comqdhb
+ */
+public class ListOfCustomers {
+
+    private static ListOfCustomers instance = null;
+
+    public synchronized static ListOfCustomers getInstance() {
+        if (instance == null) {
+            instance = new ListOfCustomers();
+        }
+        return instance;
+    }
+    
+    
+
+    private ListOfCustomers() {
+
+    }
+
+    Map<String, Customer> customers = new TreeMap<String, Customer>();
+    Map<String, CustomerFascade> fascades = new TreeMap<String, CustomerFascade>();
+
+    public boolean addCustomer(Customer c) {
+        if (!customerExist(c.getName())) {
+            customers.put(c.getName(), c); //calling method
+            try {
+                fascades.put(c.getName(), new CustomerImpR(c));
+            } catch (RemoteException re) {
+                re.printStackTrace();
+            }
+            return true; //Customer added
+        }
+        return false; //Customer cant be added because they already exist
+    }
+
+    CustomerFascade getCustomerFascade(String uname, String pwd, BusTrackingClient client) {
+        Customer c = customers.get(uname);
+        CustomerFascade f = null;
+        if (c != null && c.getPassword().equals(pwd)) {
+            c.addClient(client);
+            f = fascades.get(uname);
+            if (f == null) {
+                try {
+                    f = new CustomerImpR(c);
+                    fascades.put(uname, f);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return f;
+    }
+    
+    public void removeCustomer(String username)
+    {
+        if (customers.containsKey(username))
+        {
+            customers.remove(username);
+            fascades.remove(username);
+        }
+        
+        saveCustToFile();
+    }
+
+    void load() {
+        //Hardcoded users
+        //addCustomer(new Customer("user","password"));
+        //addCustomer(new Customer("user2","password"));
+
+        Map<String,Customer> allCust = null;
+        try {
+            //Read customers from file
+            FileInputStream fileIn = new FileInputStream("customers.ser");
+            ObjectInputStream in = new ObjectInputStream(fileIn);
+            allCust = (Map<String,Customer>) in.readObject();
+            in.close();
+            fileIn.close();
+
+            for (Customer c : allCust.values()) {
+                ListOfCustomers.getInstance().addCustomer(c);
+            }
+
+        } catch (Exception e) {
+            System.out.println("Error");
+            e.printStackTrace();
+        }
+    }
+    public void saveCustToFile()
+    {
+        try
+      {
+         FileOutputStream fileOut =
+         new FileOutputStream("customers.ser");
+         ObjectOutputStream out = new ObjectOutputStream(fileOut);
+         out.writeObject(customers);
+         out.close();
+         fileOut.close();
+          System.out.println("Saved Customers ");
+      }
+        catch(IOException i)
+        {
+            i.printStackTrace();
+        }
+    }
+        
+
+    
+    //Customer check, if the customer already exists.
+    public boolean customerExist(String username) {
+        return customers.containsKey(username);
+    }
+    
+    public void changePassword(String username, String newPassword)
+    {
+       customers.get(username).changePassword(newPassword);
+    }
+}
